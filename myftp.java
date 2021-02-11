@@ -47,32 +47,51 @@ public class myftp {
 				if (command.equals("quit")) {
 					check = false;
 				} else if (command.equals("get")) {
+					clientOutput.println(fullCommand);
+					String sizeString = clientInput.readLine();
+					long size = Long.parseLong(sizeString); // byte size of file
+					//System.out.println(size);
 					secondHalf = secondHalf.substring(1);
-					//System.out.println(secondHalf);
 					File test = new File(secondHalf);
-					
-					System.out.println("File path is: " + test.getAbsolutePath());
-					String input = "";
-					FileWriter fTest = new FileWriter(test);
-					clientOutput.println(fullCommand); // putting this here to test stuff
+					//System.out.println("File path is: " + test.getAbsolutePath());
+					int input = 0;
+					PrintWriter fTest = new PrintWriter(new BufferedWriter(new FileWriter(test)));
 					int i = 0;
-					System.out.println("check");
-					input = clientInput.readLine();//System.out.println("hit");
-					System.out.println(input);
-					//if (input != null) {
-					fTest.write(input);
-					fTest.flush();
-					System.out.println("loop number: " + i++);
-					//}//clientOutput.write(input);
-					//input = clientInput.read();
-					
-					//System.out.println("------------");
-					//System.out.println("-----------");
-					//fTest.write(clientInput.readLine());
-					System.out.println("end of the road");
-					test.createNewFile();
-					System.out.println(test.exists());
-					fTest.close();
+					//System.out.println("check");
+					while (input != -1) {
+						//System.out.println((char)input);
+						//input = clientInput.readLine();
+						input = clientInput.read();
+						if (input != -1) {
+							//System.out.println(input);
+								fTest.write(input);
+							//}
+						}
+						i++;
+						if (i >= size) {
+							break;
+						}
+					}
+						fTest.flush();
+						test.createNewFile();
+						//System.out.println("ummmmmmmm");
+						//System.out.println(test.exists());
+						fTest.close();
+						System.out.println(clientInput.readLine());
+				} else if (command.equals("put")) {
+					clientOutput.println(fullCommand); // here for testing right now
+					secondHalf = secondHalf.substring(1);
+					File putFile = new File(secondHalf);
+					BufferedReader bFileInput = new BufferedReader(new FileReader(putFile));
+					int i = 0;
+					while (i != -1) {
+						i = bFileInput.read();
+						if (i != -1) {
+							clientOutput.write(i);
+						}
+					}
+					bFileInput.close();
+					System.out.println(clientInput.readLine()); // for testing
 				} else {
 				//System.out.println("test 2");
 				clientOutput.println(fullCommand);
@@ -88,11 +107,7 @@ public class myftp {
 		} catch (IOException test) {
 			
 		}
-		//input.close();
-				
-	}			
-		
-		//input.close();
 
+	}			
 
 }
