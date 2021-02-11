@@ -196,36 +196,38 @@ public class myftpserver {
 		
 	}
 
-    public static void put(String pathway) {
-        try {
-            //File source = new File(pathway);
-            //FileReader fReader = new FileReader(source);
-            //String path = pwd();
-            BufferedWriter bOutput = new BufferedWriter(new FileWriter(pathway));
+	public static void put(String pathway) {
+	try {
+            String sizeString = input.readLine();
+            long size = Long.parseLong(sizeString);
+	        File test = new File(pathway);
+            PrintWriter pOutput = new PrintWriter(new BufferedWriter(new FileWriter(test)));
             System.out.println(pathway);
-            String value = input.readLine();
-            System.out.println("triggered");
+            int value = 0;
             int i = 0;
-            while (value != null) {
+            while (value != -1) {
                 //client.getOutputStream().write(value);
-                bOutput.write(value);
-                System.out.println(value);
+                value = input.read();
+                //System.out.println(value);
                 //pWriter.write(value);
-                value = input.readLine();
+                if (value != -1) {
+                    pOutput.write(value);
+                }
                 i++;
-                if (i > 75) {
+                if (i >= size) {
                     break;
                 }
             }
-            //bOutput.flush();
+            pOutput.flush();
             //client.getOutputStream().close();
-            bOutput.close();
+            test.createNewFile();
+            pOutput.close();
             //bOutput.close();
-            System.out.println("hello there");
+            //System.out.println("hello there");
             pWriter.println("File Put");
         } catch (IOException Error) {
-            
-        }
+
+		}
     }
 	
 	public static void main(String[] args) {
