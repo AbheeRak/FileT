@@ -26,12 +26,13 @@ public class myftpserver {
             Process test = build.start();
             //test = Runtime.getRuntime().exec("pwd");
             BufferedReader bRead = new BufferedReader(new InputStreamReader(test.getInputStream(),"US-ASCII"));
-            int value = bRead.read();
+            int value = 0; //bRead.read();
             while (value != -1) {
-                if ((char)value != '\n') {
+                value = bRead.read();
+                if ((char)value != '\n' && value != -1) {
                     output += (char)value;
                 }
-                value = bRead.read();
+                //value = bRead.read();
             }
             //System.out.println(output);
             //System.out.println(output);
@@ -109,47 +110,20 @@ public class myftpserver {
             Process test = build.start();
             //test = Runtime.getRuntime().exec("pwd");
             BufferedReader bRead = new BufferedReader(new InputStreamReader(test.getInputStream(),"US-ASCII"));
-            int value = bRead.read();
+            int value = 0; //bRead.read();
             String output = "";
             while (value != -1) {
-                if ((char)value != '\n') {
+                value = bRead.read();
+                if ((char)value != '\n' && value != -1) {
                     output += (char)value;
                 }
-                value = bRead.read();
+                //value = bRead.read();
             }
             bRead.close();
             test.destroy();
             String path = output;
         
             if (argument.equals("..")) {
-                // creates the current working directory
-                /*build.command("cd ..");
-                  System.out.println("--------------------------");
-                  Process test = build.start();
-                  System.out.println("hello");
-                  pWriter.println("Directory Changed");
-                  pWriter.flush();
-                  //client.getOutputStream().flush();
-                  test.destroy();
-                  } catch (IOException Error) {
-                  
-                  }*/
-                /*build.command("pwd");
-                  Process test = build.start();
-                  //test = Runtime.getRuntime().exec("pwd");
-                  BufferedReader bRead = new BufferedReader(new InputStreamReader(test.getInputStream(),"US-ASCII"));
-                  int value = bRead.read();
-                  String output = "";
-                  while (value != -1) {
-                  if ((char)value != '\n') {
-                  output += (char)value;
-                  }
-                  value = bRead.read();
-                  }
-                  bRead.close();
-                  test.destroy();
-                  String path = output; // assigns pwd output to path*/
-                //System.out.println(path + " is the path");
                 int len = path.length();
                 boolean flag = true;
                 int realSlash = 0;
@@ -194,29 +168,65 @@ public class myftpserver {
 	}
 	
 	public static void get(String pathway) {
-		try {
-			//File source = new File(pathway);
-			//FileReader fReader = new FileReader(source);
-            //String path = pwd();
-            BufferedInputStream bInput = new BufferedInputStream(new FileInputStream(pathway));
+        try {
+            File getFile = new File(pathway);
+            BufferedReader bInput = new BufferedReader(new FileReader(getFile));
+            //BufferedOutputStream bOutput = new BufferedOutputStream(new FileOutputStream());
+            long fileLength = getFile.length();
+            String convert = "" + fileLength + "\n";
+            pWriter.write(convert);
             System.out.println("test");
-//BufferedOutputStream bOutput = new BufferedOutputStream(new FileOutputStream("test.txt"));
-            //FileWriter fWrite = new FileWriter("test.txt");
-            int value = bInput.read();
-            System.out.println("triggered");
+            String output = "";
+            int value = 0;
 			while (value != -1) {
-                client.getOutputStream().write(value);
 				value = bInput.read();
                 if (value != -1) {
                     System.out.print((char)value);
+                    output += (char)value;
                 }
 			}
-            //pWriter.println("File Got");
+            bInput.close();
+            //bOutput.close();
+            System.out.println("hello there");
+            //pWriter = new PrintWriter(client.getOutputStream(), true);
+            pWriter.println(output);
 		} catch (IOException Error) {
             
 		}
 		
 	}
+
+    public static void put(String pathway) {
+        try {
+            //File source = new File(pathway);
+            //FileReader fReader = new FileReader(source);
+            //String path = pwd();
+            BufferedWriter bOutput = new BufferedWriter(new FileWriter(pathway));
+            System.out.println(pathway);
+            String value = input.readLine();
+            System.out.println("triggered");
+            int i = 0;
+            while (value != null) {
+                //client.getOutputStream().write(value);
+                bOutput.write(value);
+                System.out.println(value);
+                //pWriter.write(value);
+                value = input.readLine();
+                i++;
+                if (i > 75) {
+                    break;
+                }
+            }
+            //bOutput.flush();
+            //client.getOutputStream().close();
+            bOutput.close();
+            //bOutput.close();
+            System.out.println("hello there");
+            pWriter.println("File Put");
+        } catch (IOException Error) {
+            
+        }
+    }
 	
 	public static void main(String[] args) {
 		int port = Integer.parseInt(args[0]);
@@ -230,7 +240,7 @@ public class myftpserver {
             while (status) {
                 client = server.accept();
                 input = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                pWriter = new PrintWriter(client.getOutputStream(), true);
+                pWriter = new PrintWriter(client.getOutputStream(),true);
                 build = new ProcessBuilder();
                 check = true;
                 while (check) {
@@ -263,11 +273,16 @@ public class myftpserver {
                     } else if (command.equals("cd")) {
                         secondHalf = secondHalf.substring(1);
                         cd(secondHalf);
+                    } else if (command.equals("put")) {
+                        secondHalf = secondHalf.substring(1);
+                        put(secondHalf);
                     }
                 } // end of while check
             } // end of while status
         } catch (IOException test){
             System.out.println("System Connection error");
+        } catch (NullPointerException check) {
+            System.out.println("Null Pointer Error");
         }
         
     }
