@@ -83,14 +83,19 @@ public class myftp {
 					secondHalf = secondHalf.substring(1);
 					File putFile = new File(secondHalf);
 					BufferedReader bFileInput = new BufferedReader(new FileReader(putFile));
-					int i = 0;
-					while (i != -1) {
-						i = bFileInput.read();
-						if (i != -1) {
-							clientOutput.write(i);
+					long fileLength = putFile.length();
+					String convert = "" + fileLength + "\n";
+					clientOutput.write(convert);
+					String output = "";
+					int value = 0;
+					while (value != -1) {
+						value = bFileInput.read();
+						if (value != -1) {
+							output += (char)value;
 						}
 					}
 					bFileInput.close();
+					clientOutput.println(output);
 					System.out.println(clientInput.readLine()); // for testing
 				} else {
 				//System.out.println("test 2");
