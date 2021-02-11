@@ -77,7 +77,7 @@ public class myftpserver {
 	
 	public static void delete(String argument) {
 		try {
-            build.command("rm" + argument);
+            build.command("rm",argument);
             Process test = build.start();
 			//Process test = Runtime.getRuntime().exec("rm " + argument);
 			pWriter.println("Deleted" + argument);
@@ -91,7 +91,7 @@ public class myftpserver {
 	
 	public static void mkdir(String argument) {
 		try {
-            build.command("mkdir" + argument);
+            build.command("mkdir",argument);
             Process test = build.start();
 			//Process test = Runtime.getRuntime().exec("mkdir" + argument);
 			pWriter.println("Directory Created");
