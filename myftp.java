@@ -1,33 +1,23 @@
 import java.net.*;
 import java.io.*;
-import java.util.Scanner;
 
+/**
+ * This class creates a client object that connects to a server for file transfer.
+ */
 public class myftp {
-
-	public void start(String system, int port) {
-		try {
-			Socket client = new Socket(system, port);
-		} catch (IOException test) {
-					
-		}
-	}
 	
+	/**
+	 * The main method establishes a connection to a server and prompts for and handles user input.
+	 */
 	public static void main(String[] args) {
-		//Scanner input = new Scanner(System.in);
-
-			
-		//myftpserver server = new myftpserver();
-			
 		String system = args[0];
 		int port = Integer.parseInt(args[1]);
-		//myftp connection = new myftp(); // creates a client object
-		//connection.start(system, port); // connects to the server
 		try {
 			Socket client = new Socket(system, port);
 			PrintWriter clientOutput = new PrintWriter(client.getOutputStream(),true);
 			BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
 			BufferedReader clientInput = new BufferedReader(new InputStreamReader(client.getInputStream()));
-					
+			
 			boolean check = true;
 			String fullCommand;
 			String command;
@@ -49,68 +39,71 @@ public class myftp {
 				} else if (command.equals("get")) {
 					clientOutput.println(fullCommand);
 					String sizeString = clientInput.readLine();
-					long size = Long.parseLong(sizeString); // byte size of file
-					//System.out.println(size);
-					secondHalf = secondHalf.substring(1);
-					File test = new File(secondHalf);
-					//System.out.println("File path is: " + test.getAbsolutePath());
-					int input = 0;
-					PrintWriter fTest = new PrintWriter(new BufferedWriter(new FileWriter(test)));
-					int i = 0;
-					//System.out.println("check");
-					while (input != -1) {
-						//System.out.println((char)input);
-						//input = clientInput.readLine();
-						input = clientInput.read();
-						if (input != -1) {
-							//System.out.println(input);
+					if (sizeString.equals("false")) {
+						secondHalf = secondHalf.substring(1);
+						System.out.println(secondHalf + " does not exist in the current directory.");
+					} else {
+						long size = Long.parseLong(sizeString); // byte size of file
+						secondHalf = secondHalf.substring(1);
+						File test = new File(secondHalf);
+						int input = 0;
+						PrintWriter fTest = new PrintWriter(new BufferedWriter(new FileWriter(test)));
+						int i = 0;
+						while (input != -1) { // checks for end of file
+							input = clientInput.read();
+							if (input != -1) {
 								fTest.write(input);
-							//}
+							}
+							i++;
+							if (i >= size) { // breaks if all bytes are read
+								break;
+							}
 						}
-						i++;
-						if (i >= size) {
-							break;
-						}
-					}
 						fTest.flush();
 						test.createNewFile();
-						//System.out.println("ummmmmmmm");
-						//System.out.println(test.exists());
 						fTest.close();
 						System.out.println(clientInput.readLine());
+					}
 				} else if (command.equals("put")) {
-					clientOutput.println(fullCommand); // here for testing right now
+					clientOutput.println(fullCommand);
 					secondHalf = secondHalf.substring(1);
 					File putFile = new File(secondHalf);
-					BufferedReader bFileInput = new BufferedReader(new FileReader(putFile));
-					long fileLength = putFile.length();
-					String convert = "" + fileLength + "\n";
-					clientOutput.write(convert);
-					String output = "";
-					int value = 0;
-					while (value != -1) {
-						value = bFileInput.read();
-						if (value != -1) {
-							output += (char)value;
+					if (putFile.isFile()) {
+						BufferedReader bFileInput = new BufferedReader(new FileReader(putFile));
+						long fileLength = putFile.length();
+						String convert = "" + fileLength + "\n";
+						clientOutput.write(convert);
+						String output = "";
+						int value = 0;
+						while (value != -1) {
+							value = bFileInput.read();
+							if (value != -1) {
+								output += (char)value;
+							}
 						}
+						bFileInput.close();
+						clientOutput.println(output);
+						System.out.println(clientInput.readLine());
+					} else {
+						System.out.println(secondHalf + " does not exist in current directory.");
+						clientOutput.println("");
+						//System.out.println(clientInput.readLine());
 					}
-					bFileInput.close();
-					clientOutput.println(output);
-					System.out.println(clientInput.readLine()); // for testing
 				} else {
-				//System.out.println("test 2");
-				clientOutput.println(fullCommand);
-				//System.out.println("what is this");
-				System.out.println(clientInput.readLine());
+					clientOutput.println(fullCommand);
+					System.out.println(clientInput.readLine());
 				}
 			}
 			clientOutput.close();
 			console.close();
 			clientInput.close();
-			client.close();
+			client.close(); // close all connections once done executing
 			System.exit(0);
 		} catch (IOException test) {
-			
+			System.out.println("Client-Server communication error caught.");
+			System.out.println("If uploading/downloading file, file may not exist.");
+		} catch (NumberFormatException error) {
+			System.out.println("File transfer could not occur");
 		}
 
 	}			
