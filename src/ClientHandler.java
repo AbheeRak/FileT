@@ -22,6 +22,7 @@ public class ClientHandler implements Runnable{
                     out.println("Command read!");
                 } else {
                     out.println("Finish Him!!");
+
                 }
 
             }
