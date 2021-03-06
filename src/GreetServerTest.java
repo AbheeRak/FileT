@@ -5,9 +5,8 @@ import java.util.Date;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-package FileT;
 
-public class GreetServer {
+public class GreetServerTest {
         private static ServerSocket serverSocket1;
         private static ServerSocket serverSocket2;
         private static Socket clientSocket1;
@@ -33,8 +32,8 @@ public class GreetServer {
             clientSocket2 = serverSocket2.accept();
 
             System.out.println("Server Connected");
-            ClientHandler clientThread1 = new ClientHandler(clientSocket1);
-            ClientHandler clientThread2 = new ClientHandler(clientSocket2);
+            ClientHandlerTest clientThread1 = new ClientHandlerTest(clientSocket1);
+            ClientHandlerTest clientThread2 = new ClientHandlerTest(clientSocket2);
 
 
             Thread t1 = new Thread(clientThread1);

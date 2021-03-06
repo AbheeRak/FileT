@@ -4,13 +4,20 @@ import java.net.*;
 /**
  * This class creates a server that handles directory migration and file transfer.
  */
-public class myftpserver {
+public class CommandHandler implements Runnable {
 
     private static BufferedReader input;
     private static Socket client;
     private static PrintWriter pWriter;
     private static ProcessBuilder build;	
 
+    
+    public CommandHandler (Socket clientSocket) throws IOException {
+        client = clientSocket;
+        //in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+        //out = new PrintWriter(client.getOutputStream(),true);
+    }
+    
     /**
      * This method finds the current working directory of ProcessBuilder build and sends it to the client socket.
      */
@@ -221,22 +228,21 @@ public class myftpserver {
             System.out.println("Error when uploading file");
         }
     }
-
-    /**
-     * The main method executes the server, checks and accepts connections from clients, and handles client commands.
-     */
-	public static void main(String[] args) {
-		int nport = Integer.parseInt(args[0]);
-        int tport = Integer.parseInt(args[1]);
-            try {
-            ServerSocket server = new ServerSocket(port);
+    
+    @Override
+	public void run() {
+		//int nport = Integer.parseInt(args[0]);
+        //int tport = Integer.parseInt(args[1]);
+        //int port = 8200;
+        try {
+            //ServerSocket server = new ServerSocket(port);
             boolean status = true;
             String fullCommand;
             String command;
             String secondHalf;
             boolean check;
             while (status) {
-                client = server.accept();
+                //client = server.accept();
                 input = new BufferedReader(new InputStreamReader(client.getInputStream())); // receives client input
                 pWriter = new PrintWriter(client.getOutputStream(),true); // used to output to client
                 build = new ProcessBuilder(); // handles method processes

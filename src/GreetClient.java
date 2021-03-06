@@ -39,6 +39,6 @@ public class GreetClient {
         }
             socket1.close();
             System.exit(0);
-        }
-
     }
+    
+}
