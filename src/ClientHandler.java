@@ -15,15 +15,14 @@ public class ClientHandler implements Runnable{
     @Override
     public void run() {
         try {
+
             while (true) {
 
-                String request = in.readLine();
-                if (request.contains("command")) {
-                    out.println("Command read!");
-                } else {
-                    out.println("Finish Him!!");
+                CommandHandler minions = new CommandHandler(client);
 
-                }
+                Thread masterthread = new Thread(minions);
+                System.out.println("Starting a minion thread");
+                masterthread.start();
 
             }
         }
