@@ -14,7 +14,7 @@ public class myftpserver {
 
     private static BufferedReader in;
     private static PrintWriter out;
-    private static int NPORT = 9090;
+    private static int NPORT = 9010;
     private static int TPORT = 9080;
 
     //private static ArrayList<ClientHandler> clients = new ArrayList<>();
@@ -29,17 +29,19 @@ public class myftpserver {
         while(true) {
             System.out.println("Server waiting for connection....");
             clientSocket1 = serverSocket1.accept();
-            //clientSocket2 = serverSocket2.accept();
+            clientSocket2 = serverSocket2.accept();
             
             System.out.println("Server Connected");
             ClientHandler clientThread1 = new ClientHandler(clientSocket1);
-            //ClientHandler clientThread2 = new ClientHandler(clientSocket2);
+            ClientHandler2 clientThread2 = new ClientHandler(clientSocket2);
             //Minion cRunnable = new Minion(clientSocket1);
             Thread t1 = new Thread(clientThread1);
             //clients.add(cRunnable);
+            Thread t2 = new Thread(clientThread2);
             //Thread t1 = new Thread(clientThread1);
             /*  Thread t2 = new Thread(clientThread2);*/
             t1.start();
+            t2.start();
                 
             /*clients.add(clientThread1);
               clients.add(clientThread2);
