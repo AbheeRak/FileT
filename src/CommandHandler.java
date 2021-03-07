@@ -172,7 +172,7 @@ public class CommandHandler implements Runnable {
             boolean check = getFile.isFile();
             if (check) {
                 //System.out.println(getFile.isFile());
-                pWriter.println("Command Id: " + Thread.currentThread().getId()); // returns current thread id to client
+                //pWriter.println("Command Id: " + Thread.currentThread().getId()); // returns current thread id to client
                 BufferedReader bInput = new BufferedReader(new FileReader(getFile));
                 long fileLength = getFile.length();
                 String convert = "" + fileLength + "\n";
@@ -187,7 +187,8 @@ public class CommandHandler implements Runnable {
                     }
                 }
                 bInput.close();
-                //pWriter.println(output + "File Downloaded");
+                // currently outputs file and then returns id
+                pWriter.println(output + "Command Id: " + Thread.currentThread().getId()); //"File Downloaded");
             } else {
                 pWriter.println(check);
             }
@@ -278,7 +279,7 @@ public class CommandHandler implements Runnable {
                         // invokes ampHandler section
                         if (endCommand.equals("&")) { // handles "&" cases
                             fullCommand = fullCommand.substring(0,finalIndex);
-                            ampHandler singleRun = new ampHandler(client, fullCommand);
+                            ampHandler singleRun = new ampHandler(client, fullCommand, getPathway());
                             Thread tAmp = new Thread(singleRun); // runs instance of ampHandler
                             tAmp.start();
                             continue;

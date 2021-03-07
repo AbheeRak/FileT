@@ -11,11 +11,14 @@ public class ampHandler implements Runnable {
     private static PrintWriter pWriter;
     private static ProcessBuilder build;
     private static String ampCommand;
-
+    private static String currDirectory;    
     
-    public ampHandler (Socket clientSocket, String command) throws IOException {
+    public ampHandler (Socket clientSocket, String command, String environment) throws IOException {
         client = clientSocket;
         ampCommand = command;
+        //build = new ProcessBuilder();
+        currDirectory = environment;
+        //build.directory(new File(environment));
         //in = new BufferedReader(new InputStreamReader(client.getInputStream()));
         //out = new PrintWriter(client.getOutputStream(),true);
     }
@@ -174,7 +177,7 @@ public class ampHandler implements Runnable {
             boolean check = getFile.isFile();
             if (check) {
                 //System.out.println(getFile.isFile());
-                pWriter.println("Command Id: " + Thread.currentThread().getId()); // returns current thread id to client
+                //pWriter.println("Command Id: " + Thread.currentThread().getId()); // returns current thread id to client
                 BufferedReader bInput = new BufferedReader(new FileReader(getFile));
                 long fileLength = getFile.length();
                 String convert = "" + fileLength + "\n";
@@ -189,7 +192,8 @@ public class ampHandler implements Runnable {
                     }
                 }
                 bInput.close();
-                //pWriter.println(output + "File Downloaded");
+                
+                pWriter.println(output + "Command Id: " + Thread.currentThread().getId());//"File Downloaded");
             } else {
                 pWriter.println(check);
             }
@@ -235,21 +239,23 @@ public class ampHandler implements Runnable {
     
     @Override
 	public void run() {
-		//int nport = Integer.parseInt(args[0]);
-        //int tport = Integer.parseInt(args[1]);
-        //int port = 8200;
         try {
             //ServerSocket server = new ServerSocket(port);
+            myftpserver.idTable.put(Thread.currentThread().getId(), "Active");
             boolean status = true;
             String fullCommand;
             String command;
             String secondHalf;
             //client = server.accept();
             input = new BufferedReader(new InputStreamReader(client.getInputStream())); // receives client input
+            System.out.println(myftpserver.idTable); // -- test --------------------------------------------------
             pWriter = new PrintWriter(client.getOutputStream(),true); // used to output to client
             build = new ProcessBuilder(); // handles method processes
             build.directory(new File(getPathway())); // sets current directory
-            
+
+            System.out.println(currDirectory);
+            cd(currDirectory);
+
             fullCommand = ampCommand; // assigns fullCommand to the ampCommand
             if (fullCommand == null || fullCommand.equals("quit")) {
                 // close current client connections
@@ -286,10 +292,6 @@ public class ampHandler implements Runnable {
                     }
                 }
             }
-            /*
-            input.close();
-            pWriter.close();
-            client.close();*/
         } catch (IOException test){
             System.out.println("Server-Client Connection error");
         }      
