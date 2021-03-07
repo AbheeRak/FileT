@@ -110,7 +110,8 @@ public class myftp {
 						//System.out.println(clientInput.readLine());
 					}
 				} else if (command.equals("terminate")) {
-					tOutput.println(fullCommand);
+					secondHalf = secondHalf.substring(1);
+					tOutput.println(secondHalf);
 					System.out.println(tInput.readLine()); // may need to be changed ----------------
 				} else {
 					clientOutput.println(fullCommand);
