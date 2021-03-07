@@ -17,7 +17,7 @@ public class myftpserver {
     private static int NPORT = 9090;
     private static int TPORT = 9080;
 
-    private static ArrayList<Minion> clients = new ArrayList<>();
+    //private static ArrayList<ClientHandler> clients = new ArrayList<>();
 //        private static ExecutorService pool = Executors.newFixedThreadPool(10);
 
     public static void main(String[] args) throws IOException {
@@ -32,14 +32,14 @@ public class myftpserver {
             //clientSocket2 = serverSocket2.accept();
             
             System.out.println("Server Connected");
-            //ClientHandler clientThread1 = new ClientHandler(clientSocket1);
+            ClientHandler clientThread1 = new ClientHandler(clientSocket1);
             //ClientHandler clientThread2 = new ClientHandler(clientSocket2);
-            Minion cRunnable = new Minion(clientSocket1);
-            Thread c1 = new Thread(cRunnable);
-            clients.add(cRunnable);
-            /*Thread t1 = new Thread(clientThread1);
-              Thread t2 = new Thread(clientThread2);*/
-            c1.start();
+            //Minion cRunnable = new Minion(clientSocket1);
+            Thread t1 = new Thread(clientThread1);
+            //clients.add(cRunnable);
+            //Thread t1 = new Thread(clientThread1);
+            /*  Thread t2 = new Thread(clientThread2);*/
+            t1.start();
                 
             /*clients.add(clientThread1);
               clients.add(clientThread2);

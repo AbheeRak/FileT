@@ -14,29 +14,15 @@ public class ClientHandler implements Runnable{
     }
     @Override
     public void run() {
-        try {
-
-            while (true) {
-
-                CommandHandler minions = new CommandHandler(client);
-
+                CommandHandler minions = null;
+                try {
+                    minions = new CommandHandler(client);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 Thread masterthread = new Thread(minions);
                 System.out.println("Starting a minion thread");
                 masterthread.start();
-
-            }
-        }
-        catch (IOException e){
-            System.err.println("IO Exception handler");
-
-        }finally{
-            out.close();
-            try {
-                in.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
 
     }
 }
