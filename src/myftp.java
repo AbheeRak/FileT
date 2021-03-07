@@ -11,21 +11,41 @@ public class myftp {
 	 */
 	public static void main(String[] args) {
 		String system = args[0];
-		int port = Integer.parseInt(args[1]);
+		int nport = Integer.parseInt(args[1]);
+		int tport = Integer.parseInt(args[2]);
 		try {
-			Socket client = new Socket(system, port);
+			Socket client = new Socket(system, nport);
 			PrintWriter clientOutput = new PrintWriter(client.getOutputStream(),true);
 			BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
 			BufferedReader clientInput = new BufferedReader(new InputStreamReader(client.getInputStream()));
+			
+			Socket terminate = new Socket(system, tport);
+			PrintWriter tOutput = new PrintWriter(terminate.getOutputStream(),true);
+			BufferedReader tInput = new BufferedReader(new InputStreamReader(terminate.getInputStream()));
 			
 			boolean check = true;
 			String fullCommand;
 			String command;
 			String secondHalf;
+			String lastPart;
 			while (check) {
 				System.out.print("mytftp>");
 				fullCommand = console.readLine();
 				int index = fullCommand.indexOf(" ");
+				int finalIndex = 0;
+				String endCommand = fullCommand;
+				int storedValue;
+				while (endCommand.indexOf(" ") > 0) {
+					storedValue = endCommand.indexOf(" ");
+					finalIndex += storedValue;
+					endCommand = endCommand.substring(storedValue + 1);
+				}
+				endCommand = fullCommand;
+				if (finalIndex <= 0) {
+					finalIndex = index;
+				} else {
+					endCommand = fullCommand.substring(finalIndex + 1); // will be used to check if ends in &
+				}
 				//System.out.println(index); // for testing
 				if (index < 0) {
 					command = fullCommand;
@@ -89,6 +109,9 @@ public class myftp {
 						clientOutput.println("");
 						//System.out.println(clientInput.readLine());
 					}
+				} else if (command.equals("terminate")) {
+					tOutput.println(fullCommand);
+					System.out.println(tInput.readLine()); // may need to be changed ----------------
 				} else {
 					clientOutput.println(fullCommand);
 					System.out.println(clientInput.readLine());
