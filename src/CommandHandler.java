@@ -172,6 +172,7 @@ public class CommandHandler implements Runnable {
             boolean check = getFile.isFile();
             if (check) {
                 //System.out.println(getFile.isFile());
+                pWriter.println("Command Id: " + Thread.currentThread().getId()); // returns current thread id to client
                 BufferedReader bInput = new BufferedReader(new FileReader(getFile));
                 long fileLength = getFile.length();
                 String convert = "" + fileLength + "\n";
@@ -186,7 +187,7 @@ public class CommandHandler implements Runnable {
                     }
                 }
                 bInput.close();
-                pWriter.println(output + "File Downloaded");
+                //pWriter.println(output + "File Downloaded");
             } else {
                 pWriter.println(check);
             }
@@ -200,6 +201,7 @@ public class CommandHandler implements Runnable {
      */
     public static void put(String pathway) {
         try {
+            pWriter.println("Command Id: " + Thread.currentThread().getId());
             String sizeString = input.readLine();
             long size = Long.parseLong(sizeString);
             pathway = getPathway() + File.separator + pathway;
@@ -221,7 +223,7 @@ public class CommandHandler implements Runnable {
             pOutput.flush();
             test.createNewFile();
             pOutput.close();
-            pWriter.println("File Uploaded");
+            //pWriter.println("File Uploaded");
         } catch (IOException Error) {
             System.out.println("IOException Error when uploading file");
         } catch (NumberFormatException Error) {

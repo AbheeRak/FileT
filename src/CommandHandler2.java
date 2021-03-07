@@ -1,29 +1,29 @@
 import java.io.*;
-import java.net.*;
+import java.net.Socket;
 
 /**
  * This class creates a server that handles directory migration and file transfer.
  */
-public class Minion implements Runnable {
+public class CommandHandler2 implements Runnable {
 
     private static BufferedReader input;
     private static Socket client;
     private static PrintWriter pWriter;
-    private static ProcessBuilder build;	
+    private static ProcessBuilder build;
 
-    
-    public Minion (Socket clientSocket) throws IOException {
+
+    public CommandHandler2(Socket clientSocket) throws IOException {
         client = clientSocket;
         //in = new BufferedReader(new InputStreamReader(client.getInputStream()));
         //out = new PrintWriter(client.getOutputStream(),true);
     }
-    
+
     /**
      * This method finds the current working directory of ProcessBuilder build and sends it to the client socket.
      */
-	public static void pwd() {
-		String output = "";
-		try {
+    public static void pwd() {
+        String output = "";
+        try {
             build.command("pwd");
             Process test = build.start();
             BufferedReader bRead = new BufferedReader(new InputStreamReader(test.getInputStream(),"US-ASCII"));
@@ -39,12 +39,12 @@ public class Minion implements Runnable {
             client.getOutputStream().flush();
             bRead.close();
             test.destroy();
-		} catch (IOException test) {
-			System.out.println("IOException error finding the current working directory");
-			
-		}
-		//return output;
-	}
+        } catch (IOException test) {
+            System.out.println("IOException error finding the current working directory");
+
+        }
+        //return output;
+    }
 
     /**
      * This method finds and returns the current working directory of ProcessBuilder build as a String object.
@@ -75,10 +75,10 @@ public class Minion implements Runnable {
      * This method uses the ProcessBuilder build object to execute the Linux "ls" command and sends the results to the client
      * socket.
      */
-	public static void ls() {
-		try {
+    public static void ls() {
+        try {
             build.command("ls");
-			Process test = build.start();
+            Process test = build.start();
             BufferedReader bRead = new BufferedReader(new InputStreamReader(test.getInputStream()));
             int value = 0;
             String output = "";
@@ -98,38 +98,38 @@ public class Minion implements Runnable {
             bRead.close();
             test.destroy();
         } catch (IOException test) {
-            System.out.println("IOException error listing out files in current directory");	
-        }		
-	}
+            System.out.println("IOException error listing out files in current directory");
+        }
+    }
 
     /**
      * This method deletes a specified file provided by the client command argument.
      */
-	public static void delete(String argument) {
-            argument = getPathway() + File.separator + argument;
-            File dFile = new File(argument);
-            dFile.delete();
-			pWriter.println("Deleted " + argument);
-            pWriter.flush();
-	}
+    public static void delete(String argument) {
+        argument = getPathway() + File.separator + argument;
+        File dFile = new File(argument);
+        dFile.delete();
+        pWriter.println("Deleted " + argument);
+        pWriter.flush();
+    }
 
     /**
      * This method creates a new directory specified by the client command argument.
      */
-	public static void mkdir(String argument) {
-            argument = getPathway() + File.separator + argument;
-            File dirFile = new File(argument);
-            dirFile.mkdir();
-            pWriter.println("Directory Created");
-            pWriter.flush();
+    public static void mkdir(String argument) {
+        argument = getPathway() + File.separator + argument;
+        File dirFile = new File(argument);
+        dirFile.mkdir();
+        pWriter.println("Directory Created");
+        pWriter.flush();
     }
 
     /**
      * This method changes directories either to a subdirectory specified in the argument or to the parent directory
      * of the current working directory if the argument is equal to ".."
      */
-	public static void cd(String argument) {
-        String path = getPathway(); // gets the current directory path       
+    public static void cd(String argument) {
+        String path = getPathway(); // gets the current directory path
         if (argument.equals("..")) {
             int len = path.length();
             boolean flag = true;
@@ -159,13 +159,13 @@ public class Minion implements Runnable {
             } else {
                 pWriter.println("Directory Does Not Exist");
             }
-        }   
-	}
-    
+        }
+    }
+
     /**
      * This method gets a file from the current directory and sends it to the working directory of the client.
      */
-	public static void get(String pathway) {
+    public static void get(String pathway) {
         try {
             pathway = getPathway() + File.separator + pathway;
             File getFile = new File(pathway);
@@ -190,10 +190,10 @@ public class Minion implements Runnable {
             } else {
                 pWriter.println(check);
             }
-		} catch (IOException Error) {
+        } catch (IOException Error) {
             pWriter.println("IOException Error when downloading file");
-		}
-	}
+        }
+    }
 
     /**
      * This method pulls a file from the client's working directory and sends it to the current directory.
@@ -228,10 +228,10 @@ public class Minion implements Runnable {
             System.out.println("Error when uploading file");
         }
     }
-    
+
     @Override
-	public void run() {
-		//int nport = Integer.parseInt(args[0]);
+    public void run() {
+        //int nport = Integer.parseInt(args[0]);
         //int tport = Integer.parseInt(args[1]);
         //int port = 8200;
         try {
@@ -290,6 +290,6 @@ public class Minion implements Runnable {
             } // end of while status
         } catch (IOException test){
             System.out.println("Server-Client Connection error");
-        }         
+        }
     }
 }
