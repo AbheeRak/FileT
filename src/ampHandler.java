@@ -181,6 +181,7 @@ public class ampHandler implements Runnable {
                 BufferedReader bInput = new BufferedReader(new FileReader(getFile));
                 long fileLength = getFile.length();
                 String convert = "" + fileLength + "\n";
+                //System.out.println(convert);
                 pWriter.write(convert);
                 String output = "";
                 int value = 0;
