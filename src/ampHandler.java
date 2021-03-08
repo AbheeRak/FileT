@@ -243,6 +243,10 @@ public class ampHandler implements Runnable {
                 if (total >= 1000) {
                     total = 0;
                     tCheck = myftpserver.idTable.get(Thread.currentThread().getId());
+                    if (tCheck.equals("Deactive")) {
+                        stop();
+                        break;
+                    }
                 }
                 i++;
                 if (i >= size) {
