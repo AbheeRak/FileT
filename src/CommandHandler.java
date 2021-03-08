@@ -241,6 +241,8 @@ public class CommandHandler implements Runnable {
         //int port = 8200;
         try {
             //ServerSocket server = new ServerSocket(port);
+            myftpserver.idTable.put(Thread.currentThread().getId(), "Active"); // for testing purposes ---------------
+            System.out.println(Thread.currentThread().getId());
             boolean status = true;
             String fullCommand;
             String command;
@@ -254,8 +256,10 @@ public class CommandHandler implements Runnable {
                 build = new ProcessBuilder(); // handles method processes
                 build.directory(new File(getPathway())); // sets current directory
                 check = true;
-                while (check) {                  
+                while (check) {
+                    System.out.println("triggered");
                     fullCommand = input.readLine();
+                    System.out.println("fullCommand: " + fullCommand);
                     if (fullCommand == null || fullCommand.equals("quit")) {
                         check = false;
                         // close current client connections

@@ -3,49 +3,51 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+//import java.util.Iterator;
+import java.util.Map;
 
 
-public class ClientHandler2 implements Runnable{
+public class ClientHandler2 implements Runnable {
     private Socket client2;
     private BufferedReader in;
-    private PrintWriter out;
+    private PrintWriter output;
 
     public ClientHandler2(Socket clientSocket2) throws IOException {
         this.client2 = clientSocket2;
         in = new BufferedReader(new InputStreamReader(client2.getInputStream()));
         // 1912
-        out = new PrintWriter(client2.getOutputStream(),true);
+        output = new PrintWriter(client2.getOutputStream(), true);
     }
+
     @Override
     public void run() {
-//        try {
-
-//            while (true) {
-
-        CommandHandler2 minions = null;
         try {
-            minions = new CommandHandler2(client2);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //if(in contains terminate) {
-        Thread masterthread2 = new Thread(minions);
-        System.out.println("Starting a minion thread");
-//        clients.add(masterthread.getId());
-        masterthread2.start();
+            System.out.println("Existing hashmap is" + myftpserver.idTable);
 
-//            }
-//        }
-//        catch (IOException e){
-//            System.err.println("IO Exception handler");
-//
-//        }finally{
-//            out.close();
-//            try {
-//                in.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+            //Iterator idTableIterator = myftpserver.idTable.entrySet().iterator();
+            boolean check = true;
+            while (check) {
+            //while (idTableIterator.hasNext()) {
+            // Map.Entry mapElement = (Map.Entry) idTableIterator.next();
+                String value = in.readLine();
+                if (value.equals("quit")) {
+                    check = false;
+                    // close current client connections
+                    in.close();
+                    output.close();
+                    client2.close();
+                } else {
+                    Long id = Long.parseLong(value);
+                    System.out.println("id table : " + myftpserver.idTable);
+                    if (myftpserver.idTable.get(id) != null) {
+                        myftpserver.idTable.put(id, "Deactive");
+                        output.println("Terminated Process ID: " + id);
+                    }
+                }
+            }
+        } catch (IOException e) {
+        }
+        
     }
 
 }

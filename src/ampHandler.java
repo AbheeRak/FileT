@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This class creates a server that handles directory migration and file transfer.
@@ -12,6 +13,7 @@ public class ampHandler implements Runnable {
     private static ProcessBuilder build;
     private static String ampCommand;
     private static String currDirectory;    
+    private static final AtomicBoolean running = new AtomicBoolean(false);
     
     public ampHandler (Socket clientSocket, String command, String environment) throws IOException {
         client = clientSocket;
@@ -197,6 +199,10 @@ public class ampHandler implements Runnable {
                     if (total >= 1000) {
                         total = 0;
                         tCheck = myftpserver.idTable.get(Thread.currentThread().getId());
+                        if (tCheck.equals("Deactive")) {
+                            stop();
+                            break;
+                        }
                     }
                 }
                 //System.out.println(output);
@@ -217,6 +223,7 @@ public class ampHandler implements Runnable {
         try {
             pWriter.println("Command Id: " + Thread.currentThread().getId());
             String sizeString = input.readLine();
+            System.out.println(sizeString +": is the size");
             long size = Long.parseLong(sizeString);
             pathway = getPathway() + File.separator + pathway;
             File test = new File(pathway);
@@ -226,6 +233,7 @@ public class ampHandler implements Runnable {
             int i = 0;
             int total = value;
             String tCheck = "Active";
+            System.out.println("-------------------");
             while (value != -1) {
                 value = input.read();
                 if (value != -1) {
@@ -256,58 +264,67 @@ public class ampHandler implements Runnable {
 	public void run() {
         try {
             //ServerSocket server = new ServerSocket(port);
-            myftpserver.idTable.put(Thread.currentThread().getId(), "Active");
-            boolean status = true;
-            String fullCommand;
-            String command;
-            String secondHalf;
-            //client = server.accept();
-            input = new BufferedReader(new InputStreamReader(client.getInputStream())); // receives client input
-            System.out.println(myftpserver.idTable); // -- test --------------------------------------------------
-            pWriter = new PrintWriter(client.getOutputStream(),true); // used to output to client
-            build = new ProcessBuilder(); // handles method processes
-            build.directory(new File(currDirectory)); // sets current directory
-
-            fullCommand = ampCommand; // assigns fullCommand to the ampCommand
-            int len = fullCommand.length();
-            fullCommand = fullCommand.substring(0,len - 1); // gets rid of space at end of fullCommand
-            if (fullCommand == null || fullCommand.equals("quit")) {
-                // close current client connections
-                input.close();
-                pWriter.close();
-                client.close();
-            } else if (fullCommand != null) {
-                int index = fullCommand.indexOf(" ");
-                if (index < 0) {
-                    command = fullCommand;
-                    secondHalf = command;
-                } else {
-                    command = fullCommand.substring(0,index);
-                    secondHalf = fullCommand.substring(index + 1); // plus 1 skips " "
-                }
-                if (command.equals("pwd")) {
-                    pwd();
-                } else if (command.equals("ls")) {
-                    ls();
-                } else if (command.equals("delete")) {
-                    delete(secondHalf);
-                } else if (command.equals("mkdir")) {
-                    mkdir(secondHalf);
-                } else if (command.equals("get")) {
-                    get(secondHalf);
-                } else if (command.equals("cd")) {
-                    cd(secondHalf);
-                } else if (command.equals("put")) {
-                    put(secondHalf);
-                } else {
-                    if (!command.equals("")) {
-                        //System.out.println(command + ": is unrecognized");
-                        pWriter.println("Unrecognized command");
+            //while (running.get()) {
+                myftpserver.idTable.put(Thread.currentThread().getId(), "Active");
+                boolean status = true;
+                String fullCommand;
+                String command;
+                String secondHalf;
+                //client = server.accept();
+                input = new BufferedReader(new InputStreamReader(client.getInputStream())); // receives client input
+                System.out.println(myftpserver.idTable); // -- test --------------------------------------------------
+                pWriter = new PrintWriter(client.getOutputStream(),true); // used to output to client
+                build = new ProcessBuilder(); // handles method processes
+                build.directory(new File(currDirectory)); // sets current directory
+                
+                fullCommand = ampCommand; // assigns fullCommand to the ampCommand
+                int len = fullCommand.length();
+                fullCommand = fullCommand.substring(0,len - 1); // gets rid of space at end of fullCommand
+                if (fullCommand == null || fullCommand.equals("quit")) {
+                    // close current client connections
+                    input.close();
+                    pWriter.close();
+                    client.close();
+                } else if (fullCommand != null) {
+                    int index = fullCommand.indexOf(" ");
+                    if (index < 0) {
+                        command = fullCommand;
+                        secondHalf = command;
+                    } else {
+                        command = fullCommand.substring(0,index);
+                        secondHalf = fullCommand.substring(index + 1); // plus 1 skips " "
+                    }
+                    if (command.equals("pwd")) {
+                        pwd();
+                    } else if (command.equals("ls")) {
+                        ls();
+                    } else if (command.equals("delete")) {
+                        delete(secondHalf);
+                    } else if (command.equals("mkdir")) {
+                        mkdir(secondHalf);
+                    } else if (command.equals("get")) {
+                        get(secondHalf);
+                    } else if (command.equals("cd")) {
+                        cd(secondHalf);
+                    } else if (command.equals("put")) {
+                        put(secondHalf);
+                    } else {
+                        if (!command.equals("")) {
+                            //System.out.println(command + ": is unrecognized");
+                            pWriter.println("Unrecognized command");
+                        }
                     }
                 }
-            }
+                //stop();
+                myftpserver.idTable.remove(Thread.currentThread().getId());
+                //}
         } catch (IOException test){
             System.out.println("Server-Client Connection error");
         }      
     }
+
+    public static void stop() {
+        running.set(false);
+    }
+    
 }
