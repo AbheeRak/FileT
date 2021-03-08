@@ -105,7 +105,7 @@ public class CommandHandler implements Runnable {
     /**
      * This method deletes a specified file provided by the client command argument.
      */
-	public static void delete(String argument) {
+	public static synchronized void delete(String argument) {
             argument = getPathway() + File.separator + argument;
             File dFile = new File(argument);
             dFile.delete();
@@ -165,7 +165,7 @@ public class CommandHandler implements Runnable {
     /**
      * This method gets a file from the current directory and sends it to the working directory of the client.
      */
-	public static void get(String pathway) {
+	public static synchronized void get(String pathway) {
         try {
             pathway = getPathway() + File.separator + pathway;
             File getFile = new File(pathway);
@@ -202,7 +202,7 @@ public class CommandHandler implements Runnable {
     /**
      * This method pulls a file from the client's working directory and sends it to the current directory.
      */
-    public static void put(String pathway) {
+    public static synchronized void put(String pathway) {
         try {
             pWriter.println("Command Id: " + Thread.currentThread().getId());
             String sizeString = input.readLine();
