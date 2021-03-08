@@ -185,11 +185,18 @@ public class ampHandler implements Runnable {
                 pWriter.write(convert);
                 String output = "";
                 int value = 0;
+                int total = value;
+                String tCheck = "Active";
                 while (value != -1) {
                     value = bInput.read();
                     if (value != -1) {
+                        total += value;
                         //System.out.print((char)value);
                         output += (char)value;
+                    }
+                    if (total >= 1000) {
+                        total = 0;
+                        tCheck = myftpserver.idTable.get(Thread.currentThread().getId());
                     }
                 }
                 //System.out.println(output);
@@ -217,10 +224,17 @@ public class ampHandler implements Runnable {
             //System.out.println(pathway);
             int value = 0;
             int i = 0;
+            int total = value;
+            String tCheck = "Active";
             while (value != -1) {
                 value = input.read();
                 if (value != -1) {
+                    total += value;
                     pOutput.write(value);
+                }
+                if (total >= 1000) {
+                    total = 0;
+                    tCheck = myftpserver.idTable.get(Thread.currentThread().getId());
                 }
                 i++;
                 if (i >= size) {
