@@ -170,8 +170,10 @@ public class CommandHandler implements Runnable {
             pathway = getPathway() + File.separator + pathway;
             File getFile = new File(pathway);
             boolean check = getFile.isFile();
+            System.out.println("pathway: " + pathway + " file check: " + getFile.isFile());
             if (check) {
                 //System.out.println(getFile.isFile());
+                //pWriter.println("Command Id: " + Thread.currentThread().getId()); // returns current thread id to client
                 BufferedReader bInput = new BufferedReader(new FileReader(getFile));
                 long fileLength = getFile.length();
                 String convert = "" + fileLength + "\n";
@@ -185,8 +187,10 @@ public class CommandHandler implements Runnable {
                         output += (char)value;
                     }
                 }
+                //System.out.println(output);
                 bInput.close();
-                pWriter.println(output + "File Downloaded");
+                // currently outputs file and then returns id
+                pWriter.println(output + "Command Id: " + Thread.currentThread().getId()); //"File Downloaded");
             } else {
                 pWriter.println(check);
             }
@@ -200,6 +204,7 @@ public class CommandHandler implements Runnable {
      */
     public static void put(String pathway) {
         try {
+            pWriter.println("Command Id: " + Thread.currentThread().getId());
             String sizeString = input.readLine();
             long size = Long.parseLong(sizeString);
             pathway = getPathway() + File.separator + pathway;
@@ -221,7 +226,7 @@ public class CommandHandler implements Runnable {
             pOutput.flush();
             test.createNewFile();
             pOutput.close();
-            pWriter.println("File Uploaded");
+            //pWriter.println("File Uploaded");
         } catch (IOException Error) {
             System.out.println("IOException Error when uploading file");
         } catch (NumberFormatException Error) {
@@ -240,6 +245,7 @@ public class CommandHandler implements Runnable {
             String fullCommand;
             String command;
             String secondHalf;
+            String endCommand;
             boolean check;
             while (status) {
                 //client = server.accept();
@@ -248,7 +254,7 @@ public class CommandHandler implements Runnable {
                 build = new ProcessBuilder(); // handles method processes
                 build.directory(new File(getPathway())); // sets current directory
                 check = true;
-                while (check) {
+                while (check) {                  
                     fullCommand = input.readLine();
                     if (fullCommand == null || fullCommand.equals("quit")) {
                         check = false;
@@ -258,6 +264,32 @@ public class CommandHandler implements Runnable {
                         client.close();
                     } else if (fullCommand != null) {
                         int index = fullCommand.indexOf(" ");
+                        int finalIndex = 0;
+                        endCommand = fullCommand;
+                        int storedValue;
+                        while (endCommand.indexOf(" ") > 0) {
+                            storedValue = endCommand.indexOf(" ");
+                            finalIndex += storedValue;
+                            endCommand = endCommand.substring(storedValue + 1);
+                            finalIndex += 1;
+                        }
+                        endCommand = fullCommand;
+                        if (finalIndex <= 0) {
+                            finalIndex = index;
+                        } else {
+                            endCommand = fullCommand.substring(finalIndex); // will be used to check if ends in &
+                        }
+                        /*System.out.println("Endcommand: " + endCommand);
+                        System.out.println("finalIndex: " + finalIndex);
+                        System.out.println("index: " + index);*/
+                        // invokes ampHandler section
+                        if (endCommand.equals("&")) { // handles "&" cases
+                            fullCommand = fullCommand.substring(0,finalIndex);
+                            ampHandler singleRun = new ampHandler(client, fullCommand, getPathway());
+                            Thread tAmp = new Thread(singleRun); // runs instance of ampHandler
+                            tAmp.start();
+                            continue;
+                        }
                         if (index < 0) {
                             command = fullCommand;
                             secondHalf = command;
