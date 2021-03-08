@@ -69,8 +69,8 @@ public class myftp {
                 
 				if (command.equals("quit")) {
 					check = false;
+					tOutput.println(command);
 				} else if (command.equals("get") && endCommand.equals("&")) {
-					System.out.println("heller");
 					clientOutput.println(fullCommand + " " + endCommand);
 					String sizeString = clientInput.readLine();
 					if (sizeString.equals("false")) {
@@ -189,6 +189,9 @@ public class myftp {
 			console.close();
 			clientInput.close();
 			client.close(); // close all connections once done executing
+			tInput.close();
+			tOutput.close();
+			terminate.close();
 			System.exit(0);
 		} catch (IOException test) {
 			System.out.println("Client-Server communication error caught.");
