@@ -170,6 +170,7 @@ public class CommandHandler implements Runnable {
             pathway = getPathway() + File.separator + pathway;
             File getFile = new File(pathway);
             boolean check = getFile.isFile();
+            System.out.println("pathway: " + pathway + " file check: " + getFile.isFile());
             if (check) {
                 //System.out.println(getFile.isFile());
                 //pWriter.println("Command Id: " + Thread.currentThread().getId()); // returns current thread id to client
@@ -186,6 +187,7 @@ public class CommandHandler implements Runnable {
                         output += (char)value;
                     }
                 }
+                //System.out.println(output);
                 bInput.close();
                 // currently outputs file and then returns id
                 pWriter.println(output + "Command Id: " + Thread.currentThread().getId()); //"File Downloaded");
@@ -269,13 +271,17 @@ public class CommandHandler implements Runnable {
                             storedValue = endCommand.indexOf(" ");
                             finalIndex += storedValue;
                             endCommand = endCommand.substring(storedValue + 1);
+                            finalIndex += 1;
                         }
                         endCommand = fullCommand;
                         if (finalIndex <= 0) {
                             finalIndex = index;
                         } else {
-                            endCommand = fullCommand.substring(finalIndex + 1); // will be used to check if ends in &
+                            endCommand = fullCommand.substring(finalIndex); // will be used to check if ends in &
                         }
+                        /*System.out.println("Endcommand: " + endCommand);
+                        System.out.println("finalIndex: " + finalIndex);
+                        System.out.println("index: " + index);*/
                         // invokes ampHandler section
                         if (endCommand.equals("&")) { // handles "&" cases
                             fullCommand = fullCommand.substring(0,finalIndex);

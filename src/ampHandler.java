@@ -18,9 +18,6 @@ public class ampHandler implements Runnable {
         ampCommand = command;
         //build = new ProcessBuilder();
         currDirectory = environment;
-        //build.directory(new File(environment));
-        //in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-        //out = new PrintWriter(client.getOutputStream(),true);
     }
     
     /**
@@ -173,8 +170,11 @@ public class ampHandler implements Runnable {
 	public static void get(String pathway) {
         try {
             pathway = getPathway() + File.separator + pathway;
+            //System.out.println("pathway: " + pathway);
             File getFile = new File(pathway);
             boolean check = getFile.isFile();
+            System.out.println(getPathway());
+            //System.out.println("pathway: " + pathway + " file check: " + getFile.isFile());
             if (check) {
                 //System.out.println(getFile.isFile());
                 //pWriter.println("Command Id: " + Thread.currentThread().getId()); // returns current thread id to client
@@ -191,8 +191,8 @@ public class ampHandler implements Runnable {
                         output += (char)value;
                     }
                 }
+                //System.out.println(output);
                 bInput.close();
-                
                 pWriter.println(output + "Command Id: " + Thread.currentThread().getId());//"File Downloaded");
             } else {
                 pWriter.println(check);
@@ -251,12 +251,11 @@ public class ampHandler implements Runnable {
             System.out.println(myftpserver.idTable); // -- test --------------------------------------------------
             pWriter = new PrintWriter(client.getOutputStream(),true); // used to output to client
             build = new ProcessBuilder(); // handles method processes
-            build.directory(new File(getPathway())); // sets current directory
-
-            System.out.println(currDirectory);
-            cd(currDirectory);
+            build.directory(new File(currDirectory)); // sets current directory
 
             fullCommand = ampCommand; // assigns fullCommand to the ampCommand
+            int len = fullCommand.length();
+            fullCommand = fullCommand.substring(0,len - 1); // gets rid of space at end of fullCommand
             if (fullCommand == null || fullCommand.equals("quit")) {
                 // close current client connections
                 input.close();
