@@ -206,6 +206,7 @@ public class CommandHandler implements Runnable {
         try {
             pWriter.println("Command Id: " + Thread.currentThread().getId());
             String sizeString = input.readLine();
+            System.out.println(sizeString + ": total number of bytes");
             long size = Long.parseLong(sizeString);
             pathway = getPathway() + File.separator + pathway;
             File test = new File(pathway);
@@ -215,6 +216,7 @@ public class CommandHandler implements Runnable {
             int i = 0;
             while (value != -1) {
                 value = input.read();
+                System.out.println(value); // value println
                 if (value != -1) {
                     pOutput.write(value);
                 }
@@ -257,7 +259,6 @@ public class CommandHandler implements Runnable {
                 build.directory(new File(getPathway())); // sets current directory
                 check = true;
                 while (check) {
-                    System.out.println("triggered");
                     fullCommand = input.readLine();
                     System.out.println("fullCommand: " + fullCommand);
                     if (fullCommand == null || fullCommand.equals("quit")) {
@@ -292,36 +293,39 @@ public class CommandHandler implements Runnable {
                             ampHandler singleRun = new ampHandler(client, fullCommand, getPathway());
                             Thread tAmp = new Thread(singleRun); // runs instance of ampHandler
                             tAmp.start();
-                            continue;
-                        }
-                        if (index < 0) {
-                            command = fullCommand;
-                            secondHalf = command;
-                        } else {
-                            command = fullCommand.substring(0,index);
-                            secondHalf = fullCommand.substring(index + 1); // plus 1 skips " "
-                        }
-                        if (command.equals("pwd")) {
-                            pwd();
-                        } else if (command.equals("ls")) {
-                            ls();
-                        } else if (command.equals("delete")) {
-                            delete(secondHalf);
-                        } else if (command.equals("mkdir")) {
-                            mkdir(secondHalf);
-                        } else if (command.equals("get")) {
-                            get(secondHalf);
-                        } else if (command.equals("cd")) {
-                            cd(secondHalf);
-                        } else if (command.equals("put")) {
-                            put(secondHalf);
-                        } else {
-                            if (!command.equals("")) {
-                                //System.out.println(command + ": is unrecognized");
-                                pWriter.println("Unrecognized command");
+                            while(tAmp.isAlive()) {
+                                // halts execution in loop
                             }
-                        }
-                    }
+                        } else {
+                            if (index < 0) {
+                                command = fullCommand;
+                                secondHalf = command;
+                            } else {
+                                command = fullCommand.substring(0,index);
+                                secondHalf = fullCommand.substring(index + 1); // plus 1 skips " "
+                            }
+                            if (command.equals("pwd")) {
+                                pwd();
+                            } else if (command.equals("ls")) {
+                                ls();
+                            } else if (command.equals("delete")) {
+                                delete(secondHalf);
+                            } else if (command.equals("mkdir")) {
+                                mkdir(secondHalf);
+                            } else if (command.equals("get")) {
+                                get(secondHalf);
+                            } else if (command.equals("cd")) {
+                                cd(secondHalf);
+                            } else if (command.equals("put")) {
+                                put(secondHalf);
+                            } else {
+                                if (!command.equals("")) {
+                                    //System.out.println(command + ": is unrecognized");
+                                    pWriter.println("Unrecognized command");
+                                }
+                            }
+                        } // else for if endCommand.equals("&")
+                    } // end of fullCommand not being null
                 } // end of while check
             } // end of while status
         } catch (IOException test){

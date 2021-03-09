@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class ampHandler implements Runnable {
 
-    private static BufferedReader input;
+    private static BufferedReader pInput;
     private static Socket client;
     private static PrintWriter pWriter;
     private static ProcessBuilder build;
@@ -220,10 +220,10 @@ public class ampHandler implements Runnable {
      * This method pulls a file from the client's working directory and sends it to the current directory.
      */
     public static synchronized void put(String pathway) {
-        try {
+        try {           
             pWriter.println("Command Id: " + Thread.currentThread().getId());
-            String sizeString = input.readLine();
-            System.out.println(sizeString +": is the size");
+            String sizeString = pInput.readLine();
+            //System.out.println(sizeString +": is the size");
             long size = Long.parseLong(sizeString);
             pathway = getPathway() + File.separator + pathway;
             File test = new File(pathway);
@@ -233,9 +233,8 @@ public class ampHandler implements Runnable {
             int i = 0;
             int total = value;
             String tCheck = "Active";
-            System.out.println("-------------------");
             while (value != -1) {
-                value = input.read();
+                value = pInput.read();
                 if (value != -1) {
                     total += value;
                     pOutput.write(value);
@@ -275,21 +274,25 @@ public class ampHandler implements Runnable {
                 String command;
                 String secondHalf;
                 //client = server.accept();
-                input = new BufferedReader(new InputStreamReader(client.getInputStream())); // receives client input
+                pInput = new BufferedReader(new InputStreamReader(client.getInputStream())); // receives client input
                 System.out.println(myftpserver.idTable); // -- test --------------------------------------------------
                 pWriter = new PrintWriter(client.getOutputStream(),true); // used to output to client
                 build = new ProcessBuilder(); // handles method processes
                 build.directory(new File(currDirectory)); // sets current directory
                 
                 fullCommand = ampCommand; // assigns fullCommand to the ampCommand
+                //System.out.println("ampHandler fullCommand: " + fullCommand);
                 int len = fullCommand.length();
                 fullCommand = fullCommand.substring(0,len - 1); // gets rid of space at end of fullCommand
+                //System.out.println("ampHandler fullCommand: " + fullCommand + " 2");
                 if (fullCommand == null || fullCommand.equals("quit")) {
                     // close current client connections
-                    input.close();
+                    //System.out.println("ampHandler fullCommand: " + fullCommand + " 3");
+                    pInput.close();
                     pWriter.close();
                     client.close();
                 } else if (fullCommand != null) {
+                    //System.out.println("ampHandler fullCommand: " + fullCommand + " 4");
                     int index = fullCommand.indexOf(" ");
                     if (index < 0) {
                         command = fullCommand;
@@ -321,7 +324,6 @@ public class ampHandler implements Runnable {
                 }
                 //stop();
                 myftpserver.idTable.remove(Thread.currentThread().getId());
-                //}
         } catch (IOException test){
             System.out.println("Server-Client Connection error");
         }      
