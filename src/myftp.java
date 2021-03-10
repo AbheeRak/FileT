@@ -72,6 +72,7 @@ public class myftp {
 					tOutput.println(command);
 				} else if (command.equals("get") && endCommand.equals("&")) {
 					clientOutput.println(fullCommand + " " + endCommand);
+					System.out.println(clientInput.readLine()); // trying to read pID as early as possible
 					String sizeString = clientInput.readLine();
 					if (sizeString.equals("false")) {
 						secondHalf = secondHalf.substring(1);
@@ -96,7 +97,7 @@ public class myftp {
 						fTest.flush();
 						test.createNewFile();
 						fTest.close();
-						System.out.println(clientInput.readLine());
+						clientInput.readLine(); // reads a blank character after file is got and prevents output of it
 					}
 				} else if (command.equals("get")) {
 					clientOutput.println(fullCommand);
@@ -105,6 +106,7 @@ public class myftp {
 						secondHalf = secondHalf.substring(1);
 						System.out.println(secondHalf + " does not exist in the current directory.");
 					} else {
+						//System.out.println(clientInput.readLine()); // moved from the bottom to try to receive id sooner
 						long size = Long.parseLong(sizeString); // byte size of file
 						secondHalf = secondHalf.substring(1);
 						File test = new File(secondHalf);

@@ -179,7 +179,7 @@ public class ampHandler implements Runnable {
             //System.out.println("pathway: " + pathway + " file check: " + getFile.isFile());
             if (check) {
                 //System.out.println(getFile.isFile());
-                //pWriter.println("Command Id: " + Thread.currentThread().getId()); // returns current thread id to client
+                pWriter.println("Command Id: " + Thread.currentThread().getId()); // returns current thread id to client
                 BufferedReader bInput = new BufferedReader(new FileReader(getFile));
                 long fileLength = getFile.length();
                 String convert = "" + fileLength + "\n";
@@ -207,7 +207,7 @@ public class ampHandler implements Runnable {
                 }
                 //System.out.println(output);
                 bInput.close();
-                pWriter.println(output + "Command Id: " + Thread.currentThread().getId());//"File Downloaded");
+                pWriter.println(output); //+ "Command Id: " + Thread.currentThread().getId());//"File Downloaded");
             } else {
                 pWriter.println(check);
             }
