@@ -31,6 +31,7 @@ public class myftp {
 			while (check) {
 				System.out.print("mytftp>");
 				fullCommand = console.readLine();
+				//System.out.println("fullCommand is: " + fullCommand);
 				int index = fullCommand.indexOf(" ");
 				int finalIndex = 0;
 				endCommand = fullCommand;

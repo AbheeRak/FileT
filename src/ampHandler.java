@@ -7,12 +7,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class ampHandler implements Runnable {
 
-    private static BufferedReader pInput;
-    private static Socket client;
-    private static PrintWriter pWriter;
-    private static ProcessBuilder build;
-    private static String ampCommand;
-    private static String currDirectory;    
+    private BufferedReader pInput;
+    private Socket client;
+    private PrintWriter pWriter;
+    private ProcessBuilder build;
+    private String ampCommand;
+    private String currDirectory;    
     private static final AtomicBoolean running = new AtomicBoolean(false);
     
     public ampHandler (Socket clientSocket, String command, String environment) throws IOException {
@@ -25,7 +25,7 @@ public class ampHandler implements Runnable {
     /**
      * This method finds the current working directory of ProcessBuilder build and sends it to the client socket.
      */
-	public static void pwd() {
+	public synchronized void pwd() {
 		String output = "";
 		try {
             build.command("pwd");
@@ -53,7 +53,7 @@ public class ampHandler implements Runnable {
     /**
      * This method finds and returns the current working directory of ProcessBuilder build as a String object.
      */
-    private static String getPathway() {
+    private synchronized String getPathway() {
         String output = "";
         try {
             build.command("pwd");
@@ -79,7 +79,7 @@ public class ampHandler implements Runnable {
      * This method uses the ProcessBuilder build object to execute the Linux "ls" command and sends the results to the client
      * socket.
      */
-	public static void ls() {
+	public synchronized void ls() {
 		try {
             build.command("ls");
 			Process test = build.start();
@@ -109,7 +109,7 @@ public class ampHandler implements Runnable {
     /**
      * This method deletes a specified file provided by the client command argument.
      */
-	public static synchronized void delete(String argument) {
+	public synchronized void delete(String argument) {
             argument = getPathway() + File.separator + argument;
             File dFile = new File(argument);
             dFile.delete();
@@ -120,7 +120,7 @@ public class ampHandler implements Runnable {
     /**
      * This method creates a new directory specified by the client command argument.
      */
-	public static void mkdir(String argument) {
+	public synchronized void mkdir(String argument) {
             argument = getPathway() + File.separator + argument;
             File dirFile = new File(argument);
             dirFile.mkdir();
@@ -132,7 +132,7 @@ public class ampHandler implements Runnable {
      * This method changes directories either to a subdirectory specified in the argument or to the parent directory
      * of the current working directory if the argument is equal to ".."
      */
-	public static void cd(String argument) {
+	public synchronized void cd(String argument) {
         String path = getPathway(); // gets the current directory path       
         if (argument.equals("..")) {
             int len = path.length();
@@ -169,7 +169,7 @@ public class ampHandler implements Runnable {
     /**
      * This method gets a file from the current directory and sends it to the working directory of the client.
      */
-	public static synchronized void get(String pathway) {
+	public synchronized void get(String pathway) {
         try {
             pathway = getPathway() + File.separator + pathway;
             //System.out.println("pathway: " + pathway);
@@ -219,7 +219,7 @@ public class ampHandler implements Runnable {
     /**
      * This method pulls a file from the client's working directory and sends it to the current directory.
      */
-    public static synchronized void put(String pathway) {
+    public synchronized void put(String pathway) {
         try {           
             pWriter.println("Command Id: " + Thread.currentThread().getId());
             String sizeString = pInput.readLine();
@@ -329,7 +329,7 @@ public class ampHandler implements Runnable {
         }      
     }
 
-    public static void stop() {
+    public void stop() {
         running.set(false);
     }
     

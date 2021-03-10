@@ -30,7 +30,7 @@ public class ClientHandler2 implements Runnable {
             //while (idTableIterator.hasNext()) {
             // Map.Entry mapElement = (Map.Entry) idTableIterator.next();
                 String value = in.readLine();
-                if (value.equals("quit")) {
+                if (value != null && value.equals("quit")) {
                     check = false;
                     // close current client connections
                     in.close();

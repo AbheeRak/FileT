@@ -6,10 +6,10 @@ import java.net.*;
  */
 public class CommandHandler implements Runnable {
 
-    private static BufferedReader input;
-    private static Socket client;
-    private static PrintWriter pWriter;
-    private static ProcessBuilder build;	
+    private BufferedReader input;
+    private Socket client;
+    private PrintWriter pWriter;
+    private ProcessBuilder build;	
 
     
     public CommandHandler (Socket clientSocket) throws IOException {
@@ -21,7 +21,7 @@ public class CommandHandler implements Runnable {
     /**
      * This method finds the current working directory of ProcessBuilder build and sends it to the client socket.
      */
-	public static void pwd() {
+	public synchronized void pwd() {
 		String output = "";
 		try {
             build.command("pwd");
@@ -49,7 +49,7 @@ public class CommandHandler implements Runnable {
     /**
      * This method finds and returns the current working directory of ProcessBuilder build as a String object.
      */
-    private static String getPathway() {
+    private synchronized String getPathway() {
         String output = "";
         try {
             build.command("pwd");
@@ -75,7 +75,7 @@ public class CommandHandler implements Runnable {
      * This method uses the ProcessBuilder build object to execute the Linux "ls" command and sends the results to the client
      * socket.
      */
-	public static void ls() {
+	public synchronized void ls() {
 		try {
             build.command("ls");
 			Process test = build.start();
@@ -105,7 +105,7 @@ public class CommandHandler implements Runnable {
     /**
      * This method deletes a specified file provided by the client command argument.
      */
-	public static synchronized void delete(String argument) {
+	public synchronized void delete(String argument) {
             argument = getPathway() + File.separator + argument;
             File dFile = new File(argument);
             dFile.delete();
@@ -116,7 +116,7 @@ public class CommandHandler implements Runnable {
     /**
      * This method creates a new directory specified by the client command argument.
      */
-	public static void mkdir(String argument) {
+	public synchronized void mkdir(String argument) {
             argument = getPathway() + File.separator + argument;
             File dirFile = new File(argument);
             dirFile.mkdir();
@@ -128,7 +128,7 @@ public class CommandHandler implements Runnable {
      * This method changes directories either to a subdirectory specified in the argument or to the parent directory
      * of the current working directory if the argument is equal to ".."
      */
-	public static void cd(String argument) {
+	public synchronized void cd(String argument) {
         String path = getPathway(); // gets the current directory path       
         if (argument.equals("..")) {
             int len = path.length();
@@ -165,12 +165,12 @@ public class CommandHandler implements Runnable {
     /**
      * This method gets a file from the current directory and sends it to the working directory of the client.
      */
-	public static synchronized void get(String pathway) {
+	public synchronized void get(String pathway) {
         try {
             pathway = getPathway() + File.separator + pathway;
             File getFile = new File(pathway);
             boolean check = getFile.isFile();
-            System.out.println("pathway: " + pathway + " file check: " + getFile.isFile());
+            //System.out.println("pathway: " + pathway + " file check: " + getFile.isFile());
             if (check) {
                 //System.out.println(getFile.isFile());
                 //pWriter.println("Command Id: " + Thread.currentThread().getId()); // returns current thread id to client
@@ -202,7 +202,7 @@ public class CommandHandler implements Runnable {
     /**
      * This method pulls a file from the client's working directory and sends it to the current directory.
      */
-    public static synchronized void put(String pathway) {
+    public synchronized void put(String pathway) {
         try {
             pWriter.println("Command Id: " + Thread.currentThread().getId());
             String sizeString = input.readLine();
@@ -244,18 +244,22 @@ public class CommandHandler implements Runnable {
         try {
             //ServerSocket server = new ServerSocket(port);
             myftpserver.idTable.put(Thread.currentThread().getId(), "Active"); // for testing purposes ---------------
-            System.out.println(Thread.currentThread().getId());
+            //System.out.println(Thread.currentThread().getId());
             boolean status = true;
             String fullCommand;
             String command;
             String secondHalf;
             String endCommand;
             boolean check;
-            while (status) {
+            input = new BufferedReader(new InputStreamReader(client.getInputStream())); // receives client input
+            pWriter = new PrintWriter(client.getOutputStream(),true); // used to output to client
+            build = new ProcessBuilder();
+
+            //while (status) {
                 //client = server.accept();
-                input = new BufferedReader(new InputStreamReader(client.getInputStream())); // receives client input
-                pWriter = new PrintWriter(client.getOutputStream(),true); // used to output to client
-                build = new ProcessBuilder(); // handles method processes
+                //input = new BufferedReader(new InputStreamReader(client.getInputStream())); // receives client input
+                //pWriter = new PrintWriter(client.getOutputStream(),true); // used to output to client
+                //build = new ProcessBuilder(); // handles method processes
                 build.directory(new File(getPathway())); // sets current directory
                 check = true;
                 while (check) {
@@ -327,7 +331,7 @@ public class CommandHandler implements Runnable {
                         } // else for if endCommand.equals("&")
                     } // end of fullCommand not being null
                 } // end of while check
-            } // end of while status
+                //} // end of while status
         } catch (IOException test){
             System.out.println("Server-Client Connection error");
         }         
