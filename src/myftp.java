@@ -73,22 +73,29 @@ public class myftp {
 
 
 				} else if (command.equals("get") && endCommand.equals("&")) {
-					clientOutput.println(fullCommand + " " + endCommand);
-					System.out.println(clientInput.readLine()); // trying to read pID as early as possible
-					String sizeString = clientInput.readLine();
-					if (sizeString.equals("false")) {
-						secondHalf = secondHalf.substring(1);
-						System.out.println(secondHalf + " does not exist in the current directory.");
-					} else {
 
-						long size = Long.parseLong(sizeString); // byte size of file
-						secondHalf = secondHalf.substring(1);
-						getworker gworker = new getworker(client,secondHalf,size);
+					synchronized (client) {
+						clientOutput.println(fullCommand + " " + endCommand);
+//						System.out.println(clientInput.readLine()); // trying to read pID as early as possible
+//						String sizeString = clientInput.readLine();
+//						if (sizeString.equals("false")) {
+							secondHalf = secondHalf.substring(1);
+//							System.out.println(secondHalf + " does not exist in the current directory.");
+//						} else {
 
-						Thread gthread = new Thread(gworker);
-						gthread.start();
+//							long size = Long.parseLong(sizeString); // byte size of file
+//							secondHalf = secondHalf.substring(1);
+
+							getworker gworker = new getworker(client, secondHalf);
+
+							Thread gthread = new Thread(gworker);
+							gthread.start();
+
 					}
-				} else if (command.equals("get")) {
+				}
+
+				else if (command.equals("get")) {
+
 					clientOutput.println(fullCommand);
 					String sizeString = clientInput.readLine();
 					if (sizeString.equals("false")) {
@@ -159,6 +166,7 @@ public class myftp {
 					clientOutput.println(fullCommand);
 					System.out.println(clientInput.readLine());
 				}
+				System.out.println("Hellooo");
 			}
 			clientOutput.close();
 			console.close();
