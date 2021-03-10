@@ -10,16 +10,16 @@ public class myftp {
 	 * The main method establishes a connection to a server and prompts for and handles user input.
 	 */
 	public static void main(String[] args) {
-		String system = args[0];
-		int nport = Integer.parseInt(args[1]);
-		int tport = Integer.parseInt(args[2]);
+//		String system = args[0];
+		int nport = 9010;
+		int tport = 9080;
 		try {
-			Socket client = new Socket(system, nport);
+			Socket client = new Socket("127.0.0.1", nport);
 			PrintWriter clientOutput = new PrintWriter(client.getOutputStream(),true);
 			BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
 			BufferedReader clientInput = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			
-			Socket terminate = new Socket(system, tport);
+			Socket terminate = new Socket("127.0.0.1", tport);
 			PrintWriter tOutput = new PrintWriter(terminate.getOutputStream(),true);
 			BufferedReader tInput = new BufferedReader(new InputStreamReader(terminate.getInputStream()));
 			
@@ -69,34 +69,24 @@ public class myftp {
                 
 				if (command.equals("quit")) {
 					check = false;
+					tOutput.println(command);
+
+
 				} else if (command.equals("get") && endCommand.equals("&")) {
-					System.out.println("heller");
 					clientOutput.println(fullCommand + " " + endCommand);
+					System.out.println(clientInput.readLine()); // trying to read pID as early as possible
 					String sizeString = clientInput.readLine();
 					if (sizeString.equals("false")) {
 						secondHalf = secondHalf.substring(1);
 						System.out.println(secondHalf + " does not exist in the current directory.");
 					} else {
+
 						long size = Long.parseLong(sizeString); // byte size of file
 						secondHalf = secondHalf.substring(1);
-						File test = new File(secondHalf);
-						int input = 0;
-						PrintWriter fTest = new PrintWriter(new BufferedWriter(new FileWriter(test)));
-						int i = 0;
-						while (input != -1) { // checks for end of file
-							input = clientInput.read();
-							if (input != -1) {
-								fTest.write(input);
-							}
-							i++;
-							if (i >= size) { // breaks if all bytes are read
-								break;
-							}
-						}
-						fTest.flush();
-						test.createNewFile();
-						fTest.close();
-						System.out.println(clientInput.readLine());
+						getworker gworker = new getworker(client,secondHalf,size);
+
+						Thread gthread = new Thread(gworker);
+						gthread.start();
 					}
 				} else if (command.equals("get")) {
 					clientOutput.println(fullCommand);
@@ -105,6 +95,7 @@ public class myftp {
 						secondHalf = secondHalf.substring(1);
 						System.out.println(secondHalf + " does not exist in the current directory.");
 					} else {
+						//System.out.println(clientInput.readLine()); // moved from the bottom to try to receive id sooner
 						long size = Long.parseLong(sizeString); // byte size of file
 						secondHalf = secondHalf.substring(1);
 						File test = new File(secondHalf);
@@ -129,29 +120,13 @@ public class myftp {
 				} else if (command.equals("put") && endCommand.equals("&")) {
 					clientOutput.println(fullCommand + " " + endCommand);
 					secondHalf = secondHalf.substring(1);
-					File putFile = new File(secondHalf);
-					if (putFile.isFile()) {
-						BufferedReader bFileInput = new BufferedReader(new FileReader(putFile));
-						long fileLength = putFile.length();
-						String convert = "" + fileLength + "\n";
-						clientOutput.write(convert);
-						String output = "";
-						int value = 0;
-						while (value != -1) {
-							value = bFileInput.read();
-							if (value != -1) {
-								output += (char)value;
-							}
-						}
-						bFileInput.close();
-						clientOutput.println(output);
-						System.out.println(clientInput.readLine());
-					} else {
-						System.out.println(secondHalf + " does not exist in current directory.");
-						clientOutput.println("");
-						//System.out.println(clientInput.readLine());
-					}
-				} else if (command.equals("put")) {
+					putworker pworker = new putworker(client,secondHalf);
+
+
+					Thread pthread = new Thread(pworker);
+					pthread.start();
+				}
+				 else if (command.equals("put")) {
 					clientOutput.println(fullCommand);
 					secondHalf = secondHalf.substring(1);
 					File putFile = new File(secondHalf);
@@ -189,6 +164,9 @@ public class myftp {
 			console.close();
 			clientInput.close();
 			client.close(); // close all connections once done executing
+			tInput.close();
+			tOutput.close();
+			terminate.close();
 			System.exit(0);
 		} catch (IOException test) {
 			System.out.println("Client-Server communication error caught.");
