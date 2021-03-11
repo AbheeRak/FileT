@@ -42,7 +42,7 @@ public class ClientHandler2 implements Runnable {
                     if (myftpserver.idTable.get(id) != null) {
                         myftpserver.idTable.put(id, "Terminate");
                         //output.println("Terminated Process ID: " + id);
-                        output.println("id table : " + myftpserver.idTable);
+                        output.println("Terminated Process: " + id);
                     }
                 }
             }

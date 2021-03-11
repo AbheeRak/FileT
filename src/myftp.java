@@ -1,5 +1,6 @@
 import java.net.*;
 import java.io.*;
+import java.util.HashMap;
 
 /**
  * This class creates a client object that connects to a server for file transfer.
@@ -9,10 +10,19 @@ public class myftp {
 	/**
 	 * The main method establishes a connection to a server and prompts for and handles user input.
 	 */
+	public static HashMap<Long,String> localTable;
+	
+	public static void delete(String argument) {
+		argument = File.separator + argument;
+		File dFile = new File(argument);
+		dFile.delete();
+	}
+	
 	public static void main(String[] args) {
-        String system = args[0];
+		String system = args[0];
 		int nport = Integer.parseInt(args[1]);
 		int tport = Integer.parseInt(args[2]);
+		localTable = new HashMap<Long,String>(300);;
 		try {
 			Socket client = new Socket(system, nport);
 			PrintWriter clientOutput = new PrintWriter(client.getOutputStream(),true);
@@ -73,24 +83,29 @@ public class myftp {
 
 
 				} else if (command.equals("get") && endCommand.equals("&")) {
-
 					synchronized (client) {
-						clientOutput.println(fullCommand + " " + endCommand);
+					clientOutput.println(fullCommand + " " + endCommand);
+					//System.out.println(clientInput.readLine());
+					String store = clientInput.readLine();
+					System.out.println(store); // read out pid
+					int colon = store.indexOf(":");
+					store = store.substring(colon + 1);	
 //						System.out.println(clientInput.readLine()); // trying to read pID as early as possible
 //						String sizeString = clientInput.readLine();
 //						if (sizeString.equals("false")) {
-							secondHalf = secondHalf.substring(1);
 //							System.out.println(secondHalf + " does not exist in the current directory.");
 //						} else {
 
 //							long size = Long.parseLong(sizeString); // byte size of file
-//							secondHalf = secondHalf.substring(1);
+							secondHalf = secondHalf.substring(1);
+							System.out.println("secondHalf " + secondHalf);
 
 							getworker gworker = new getworker(client, secondHalf);
 
 							Thread gthread = new Thread(gworker);
+							long providedId = Long.parseLong(store);
+							localTable.put(providedId,secondHalf);
 							gthread.start();
-
 					}
 				}
 
@@ -161,12 +176,16 @@ public class myftp {
 				} else if (command.equals("terminate")) {
 					secondHalf = secondHalf.substring(1);
 					tOutput.println(secondHalf);
+					Long id = Long.parseLong(secondHalf);
+					if (localTable.containsKey(id)) {
+						delete(secondHalf);
+					}
 					System.out.println(tInput.readLine()); // may need to be changed ----------------
 				} else {
 					clientOutput.println(fullCommand);
 					System.out.println(clientInput.readLine());
 				}
-            }
+			}
 			clientOutput.close();
 			console.close();
 			clientInput.close();

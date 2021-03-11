@@ -12,8 +12,6 @@ public class myftpserver {
 
     //private static BufferedReader in;
     //private static PrintWriter out;
-    private static int NPORT = 19020;
-    private static int TPORT = 19090;
     
     public static HashMap<Long,String> idTable; // used to store process ids of threads
     
@@ -21,8 +19,10 @@ public class myftpserver {
 //        private static ExecutorService pool = Executors.newFixedThreadPool(10);
 
     public static void main(String[] args) throws IOException {
-        ServerSocket serverSocket1 = new ServerSocket(NPORT);
-        ServerSocket serverSocket2 = new ServerSocket(TPORT);
+        int nport = Integer.parseInt(args[0]);
+        int tport = Integer.parseInt(args[1]);
+        ServerSocket serverSocket1 = new ServerSocket(nport);
+        ServerSocket serverSocket2 = new ServerSocket(tport);
         idTable = new HashMap<Long,String>(300);
         //Socket clientSocket1 = null;
         
