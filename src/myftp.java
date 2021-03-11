@@ -141,6 +141,7 @@ public class myftp {
 					}
 				} else if (command.equals("put") && endCommand.equals("&")) {
 					clientOutput.println(fullCommand + " " + endCommand);
+					System.out.println(clientInput.readLine());
 					secondHalf = secondHalf.substring(1);
 					putworker pworker = new putworker(client,secondHalf);
 

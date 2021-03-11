@@ -226,7 +226,7 @@ public class ampHandler implements Runnable {
      */
     public void put(String pathway) {
         try {           
-            pWriter.println("Command Id: " + Thread.currentThread().getId());
+            //pWriter.println("Command Id: " + Thread.currentThread().getId());
             String sizeString = pInput.readLine();
             //System.out.println(sizeString +": is the size");
             long size = Long.parseLong(sizeString);
@@ -321,6 +321,7 @@ public class ampHandler implements Runnable {
                 } else if (command.equals("cd")) {
                     cd(secondHalf);
                 } else if (command.equals("put")) {
+                    pWriter.println("Command Id: " + Thread.currentThread().getId());
                     put(secondHalf);
                 } else {
                     if (!command.equals("")) {
