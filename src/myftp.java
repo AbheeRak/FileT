@@ -10,6 +10,7 @@ public class myftp {
 	/**
 	 * The main method establishes a connection to a server and prompts for and handles user input.
 	 */
+
 	public static HashMap<Long,String> localTable;
 	
 	public static void delete(String argument) {
@@ -99,13 +100,17 @@ public class myftp {
 //							long size = Long.parseLong(sizeString); // byte size of file
 							secondHalf = secondHalf.substring(1);
 							System.out.println("secondHalf " + secondHalf);
-
+                            
 							getworker gworker = new getworker(client, secondHalf);
 
 							Thread gthread = new Thread(gworker);
+
 							long providedId = Long.parseLong(store);
 							localTable.put(providedId,secondHalf);
-							gthread.start();
+
+							//long providedId = Long.parseLong(store);
+							//localTable.put(providedId,gthread.getId());
+                                gthread.start();
 					}
 				}
 
@@ -177,6 +182,7 @@ public class myftp {
 					secondHalf = secondHalf.substring(1);
 					tOutput.println(secondHalf);
 					Long id = Long.parseLong(secondHalf);
+
 					if (localTable.containsKey(id)) {
 						delete(secondHalf);
 					}
