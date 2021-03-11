@@ -10,7 +10,6 @@ public class myftp {
 	/**
 	 * The main method establishes a connection to a server and prompts for and handles user input.
 	 */
-
 	public static HashMap<Long,String> localTable;
 	
 	public static void delete(String argument) {
@@ -86,11 +85,11 @@ public class myftp {
 				} else if (command.equals("get") && endCommand.equals("&")) {
 					synchronized (client) {
 					clientOutput.println(fullCommand + " " + endCommand);
-					//System.out.println(clientInput.readLine());
-					String store = clientInput.readLine();
-					System.out.println(store); // read out pid
-					int colon = store.indexOf(":");
-					store = store.substring(colon + 1);	
+					System.out.println(clientInput.readLine());
+					//String store = clientInput.readLine();
+					//System.out.println(store); // read out pid
+					//int colon = store.indexOf(":");
+					//store = store.substring(colon + 1);	
 //						System.out.println(clientInput.readLine()); // trying to read pID as early as possible
 //						String sizeString = clientInput.readLine();
 //						if (sizeString.equals("false")) {
@@ -100,17 +99,13 @@ public class myftp {
 //							long size = Long.parseLong(sizeString); // byte size of file
 							secondHalf = secondHalf.substring(1);
 							System.out.println("secondHalf " + secondHalf);
-                            
+
 							getworker gworker = new getworker(client, secondHalf);
 
 							Thread gthread = new Thread(gworker);
-
-							long providedId = Long.parseLong(store);
-							localTable.put(providedId,secondHalf);
-
 							//long providedId = Long.parseLong(store);
-							//localTable.put(providedId,gthread.getId());
-                                gthread.start();
+							//localTable.put(providedId,secondHalf);
+							gthread.start();
 					}
 				}
 
@@ -181,11 +176,10 @@ public class myftp {
 				} else if (command.equals("terminate")) {
 					secondHalf = secondHalf.substring(1);
 					tOutput.println(secondHalf);
-					Long id = Long.parseLong(secondHalf);
-
+					/*Long id = Long.parseLong(secondHalf);
 					if (localTable.containsKey(id)) {
 						delete(secondHalf);
-					}
+					}*/
 					System.out.println(tInput.readLine()); // may need to be changed ----------------
 				} else {
 					clientOutput.println(fullCommand);

@@ -28,11 +28,11 @@ public class getworker implements Runnable {
                 	sizeString = clientInput.readLine();
             
                 	if (sizeString.equals("false")) {
-                		secondHalf = secondHalf.substring(1);
+                		//secondHalf = secondHalf.substring(1);
                 		System.out.println(secondHalf + " does not exist in the current directory.");
                 	} else {
                 		long size = Long.parseLong(sizeString); // byte size of file
-                		secondHalf = secondHalf.substring(1);
+                		//secondHalf = secondHalf.substring(1);
 
 
                 		File test = new File(secondHalf);
