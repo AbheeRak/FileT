@@ -12,8 +12,8 @@ public class myftpserver {
 
     //private static BufferedReader in;
     //private static PrintWriter out;
-    private static int NPORT = 19010;
-    private static int TPORT = 19080;
+    private static int NPORT = 19020;
+    private static int TPORT = 19090;
     
     public static HashMap<Long,String> idTable; // used to store process ids of threads
     

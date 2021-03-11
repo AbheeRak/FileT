@@ -40,8 +40,9 @@ public class ClientHandler2 implements Runnable {
                     Long id = Long.parseLong(value);
                     System.out.println("id table : " + myftpserver.idTable);
                     if (myftpserver.idTable.get(id) != null) {
-                        myftpserver.idTable.put(id, "Deactive");
-                        output.println("Terminated Process ID: " + id);
+                        myftpserver.idTable.put(id, "Terminate");
+                        //output.println("Terminated Process ID: " + id);
+                        output.println("id table : " + myftpserver.idTable);
                     }
                 }
             }

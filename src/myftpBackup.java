@@ -10,7 +10,7 @@ public class myftp {
 	 * The main method establishes a connection to a server and prompts for and handles user input.
 	 */
 	public static void main(String[] args) {
-        String system = args[0];
+		String system = args[0];
 		int nport = Integer.parseInt(args[1]);
 		int tport = Integer.parseInt(args[2]);
 		try {
@@ -31,6 +31,7 @@ public class myftp {
 			while (check) {
 				System.out.print("mytftp>");
 				fullCommand = console.readLine();
+				//System.out.println("fullCommand is: " + fullCommand);
 				int index = fullCommand.indexOf(" ");
 				int finalIndex = 0;
 				endCommand = fullCommand;
@@ -70,32 +71,36 @@ public class myftp {
 				if (command.equals("quit")) {
 					check = false;
 					tOutput.println(command);
-
-
 				} else if (command.equals("get") && endCommand.equals("&")) {
-
-					synchronized (client) {
-						clientOutput.println(fullCommand + " " + endCommand);
-//						System.out.println(clientInput.readLine()); // trying to read pID as early as possible
-//						String sizeString = clientInput.readLine();
-//						if (sizeString.equals("false")) {
-							secondHalf = secondHalf.substring(1);
-//							System.out.println(secondHalf + " does not exist in the current directory.");
-//						} else {
-
-//							long size = Long.parseLong(sizeString); // byte size of file
-//							secondHalf = secondHalf.substring(1);
-
-							getworker gworker = new getworker(client, secondHalf);
-
-							Thread gthread = new Thread(gworker);
-							gthread.start();
-
+					clientOutput.println(fullCommand + " " + endCommand);
+					System.out.println(clientInput.readLine()); // trying to read pID as early as possible
+					String sizeString = clientInput.readLine();
+					if (sizeString.equals("false")) {
+						secondHalf = secondHalf.substring(1);
+						System.out.println(secondHalf + " does not exist in the current directory.");
+					} else {
+						long size = Long.parseLong(sizeString); // byte size of file
+						secondHalf = secondHalf.substring(1);
+						File test = new File(secondHalf);
+						int input = 0;
+						PrintWriter fTest = new PrintWriter(new BufferedWriter(new FileWriter(test)));
+						int i = 0;
+						while (input != -1) { // checks for end of file
+							input = clientInput.read();
+							if (input != -1) {
+								fTest.write(input);
+							}
+							i++;
+							if (i >= size) { // breaks if all bytes are read
+								break;
+							}
+						}
+						fTest.flush();
+						test.createNewFile();
+						fTest.close();
+						clientInput.readLine(); // reads a blank character after file is got and prevents output of it
 					}
-				}
-
-				else if (command.equals("get")) {
-
+				} else if (command.equals("get")) {
 					clientOutput.println(fullCommand);
 					String sizeString = clientInput.readLine();
 					if (sizeString.equals("false")) {
@@ -127,13 +132,29 @@ public class myftp {
 				} else if (command.equals("put") && endCommand.equals("&")) {
 					clientOutput.println(fullCommand + " " + endCommand);
 					secondHalf = secondHalf.substring(1);
-					putworker pworker = new putworker(client,secondHalf);
-
-
-					Thread pthread = new Thread(pworker);
-					pthread.start();
-				}
-				 else if (command.equals("put")) {
+					File putFile = new File(secondHalf);
+					if (putFile.isFile()) {
+						BufferedReader bFileInput = new BufferedReader(new FileReader(putFile));
+						long fileLength = putFile.length();
+						String convert = "" + fileLength + "\n";
+						clientOutput.write(convert);
+						String output = "";
+						int value = 0;
+						while (value != -1) {
+							value = bFileInput.read();
+							if (value != -1) {
+								output += (char)value;
+							}
+						}
+						bFileInput.close();
+						clientOutput.println(output);
+						System.out.println(clientInput.readLine());
+					} else {
+						System.out.println(secondHalf + " does not exist in current directory.");
+						clientOutput.println("");
+						//System.out.println(clientInput.readLine());
+					}
+				} else if (command.equals("put")) {
 					clientOutput.println(fullCommand);
 					secondHalf = secondHalf.substring(1);
 					File putFile = new File(secondHalf);
@@ -166,7 +187,7 @@ public class myftp {
 					clientOutput.println(fullCommand);
 					System.out.println(clientInput.readLine());
 				}
-            }
+			}
 			clientOutput.close();
 			console.close();
 			clientInput.close();
